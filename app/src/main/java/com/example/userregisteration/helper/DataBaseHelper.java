@@ -160,6 +160,36 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return userList;
     }
 
+
+    @SuppressLint("Range")
+    public User getUserByEmail(String email) {
+        User user = new User();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String selectQuery = "SELECT  * FROM " + TABLE_USER + " WHERE "
+                + COLUMN_USER_EMAIL + " = '" + email + "'";
+
+        Cursor cursor = db.rawQuery(selectQuery, new String[]{});
+
+        if (cursor.moveToFirst()) {
+            do {
+                user.setUserId(Integer.parseInt(cursor.getString(cursor.getColumnIndex(COLUMN_USER_ID))));
+                user.setfName(cursor.getString(cursor.getColumnIndex(COLUMN_USER_FIRST_NAME)));
+                user.setlName(cursor.getString(cursor.getColumnIndex(COLUMN_USER_LAST_NAME)));
+                user.setGender(cursor.getString(cursor.getColumnIndex(COLUMN_USER_GENDER)));
+                user.setDob(cursor.getString(cursor.getColumnIndex(COLUMN_USER_DOB)));
+                user.setMobile(cursor.getString(cursor.getColumnIndex(COLUMN_USER_MOBILE)));
+                user.setSkills(cursor.getString(cursor.getColumnIndex(COLUMN_USER_SKILLS)));
+                user.setEmail(cursor.getString(cursor.getColumnIndex(COLUMN_USER_EMAIL)));
+                user.setPassword(cursor.getString(cursor.getColumnIndex(COLUMN_USER_PASSWORD)));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return user;
+    }
+
     /**
      * This method to update user record
      *
@@ -169,8 +199,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(COLUMN_USER_FIRST_NAME, user.getfName());
-        values.put(COLUMN_USER_EMAIL, user.getEmail());
+//        values.put(COLUMN_USER_FIRST_NAME, user.getfName());
+//        values.put(COLUMN_USER_LAST_NAME, user.getlName());
+        values.put(COLUMN_USER_DOB, user.getDob());
+        values.put(COLUMN_USER_GENDER, user.getGender());
+        values.put(COLUMN_USER_SKILLS, user.getSkills());
+//        values.put(COLUMN_USER_EMAIL, user.getEmail());
+//        values.put(COLUMN_USER_MOBILE, user.getMobile());
         values.put(COLUMN_USER_PASSWORD, user.getPassword());
 
         // updating row

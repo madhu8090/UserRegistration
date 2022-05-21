@@ -11,6 +11,9 @@
     <string name="gender">Gender</string>
     <string name="skills">Skills</string>
     <string name="btn_login">Login</string>
+    <string name="welcome_user">Welcome User</string>
+    <string name="btn_logout">Logout</string>
+    <string name="btn_update">Update</string>
 
     <string-array name="gender">
         <item>Male</item>

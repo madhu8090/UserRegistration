@@ -56,7 +56,9 @@ public class LoginActivity extends AppCompatActivity {
         if (databaseHelper.checkUser(mEmail.getText().toString().trim()
                 , mPassword.getText().toString().trim())) {
             Prefs.setBoolean(PrefKeys.LOGIN_STATUS, true);
+            Prefs.setString(PrefKeys.LOGIN_EMAIL, mEmail.getText().toString());
             Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("EMAIL", mEmail.getText().toString().trim());
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();
