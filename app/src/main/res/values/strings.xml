@@ -10,6 +10,7 @@
     <string name="dob">Date of Birth</string>
     <string name="gender">Gender</string>
     <string name="skills">Skills</string>
+    <string name="btn_login">Login</string>
 
     <string-array name="gender">
         <item>Male</item>

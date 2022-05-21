@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -150,8 +151,10 @@ public class RegistrationActivity extends AppCompatActivity {
     private void saveToDb(User user) {
         if (!databaseHelper.checkUser(mEmail.getText().toString())) {
             databaseHelper.addUser(user);
-            ToastUtil.toastShort(this, "User Registered Successfully");
-            emptyView();
+            ToastUtil.toastShort(this, "User Registered Successfully, Please login to continue");
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
         } else {
             ToastUtil.toastShort(this, "User Already Registered With This Email Id");
         }
