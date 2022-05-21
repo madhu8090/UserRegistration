@@ -35,33 +35,39 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         databaseHelper = new DataBaseHelper(this);
+        String email = Prefs.getString(PrefKeys.LOGIN_EMAIL);
+        User user = databaseHelper.getUserByEmail(email);
 
         mUserName = findViewById(R.id.user_name);
         mUserDetailsTable = findViewById(R.id.table_user_details);
         mUpdate = findViewById(R.id.btn_update);
         mLogOut = findViewById(R.id.btn_logout);
 
-        String email = Prefs.getString(PrefKeys.LOGIN_EMAIL);
-        System.out.println("Email " + email);
-
         if (!Prefs.getBoolean(PrefKeys.LOGIN_STATUS)) {
-            Intent intent = new Intent(this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
+            openLoginPage();
         }
 
         mLogOut.setOnClickListener(view -> {
             Prefs.setBoolean(PrefKeys.LOGIN_STATUS, false);
             Prefs.setString(PrefKeys.LOGIN_EMAIL, null);
-            Intent intent = new Intent(this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            openLoginPage();
+        });
+
+        mUpdate.setOnClickListener(view -> {
+            Intent intent = new Intent(this, UpdateActivity.class);
+            intent.putExtra("USER", user.toString());
             startActivity(intent);
         });
 
-        User user = databaseHelper.getUserByEmail(email);
         mUserName.setText("Welcome " + user.getfName() + " " + user.getlName());
         showUserDetails(user);
+    }
+
+    private void openLoginPage() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void showUserDetails(User user) {

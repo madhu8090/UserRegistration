@@ -4,11 +4,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -19,6 +17,7 @@ import com.example.userregisteration.helper.EditTextUtils;
 import com.example.userregisteration.helper.ToastUtil;
 import com.example.userregisteration.model.User;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Locale;
 
-public class RegistrationActivity extends AppCompatActivity {
+public class UpdateActivity extends AppCompatActivity {
 
     final Calendar calendar = Calendar.getInstance();
 
@@ -40,7 +39,7 @@ public class RegistrationActivity extends AppCompatActivity {
     TextInputEditText mConfirmPassword;
     TextInputEditText mMobile;
 
-    Button mSignUp;
+    Button mUpdate;
 
     boolean[] selectedSkills;
     private DataBaseHelper databaseHelper;
@@ -50,8 +49,15 @@ public class RegistrationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_registeration);
+        setContentView(R.layout.activity_update);
+
         databaseHelper = new DataBaseHelper(this);
+        User user = new User();
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            user = new Gson().fromJson(extras.getString("USER"), User.class);
+        }
+        System.out.println("*** User " + user.toString());
 
         mFirstName = findViewById(R.id.fname);
         mLastName = findViewById(R.id.lname);
@@ -63,7 +69,7 @@ public class RegistrationActivity extends AppCompatActivity {
         mPassword = findViewById(R.id.password);
         mMobile = findViewById(R.id.mobile);
 
-        mSignUp = findViewById(R.id.btn_signup);
+        mUpdate = findViewById(R.id.btn_update);
 
         DatePickerDialog.OnDateSetListener date = (view, year, month, day) -> {
             calendar.set(Calendar.YEAR, year);
@@ -84,21 +90,33 @@ public class RegistrationActivity extends AppCompatActivity {
             showSkillsDialog(selectedSkills, skills);
         });
 
-        mSignUp.setOnClickListener(view -> {
+        User finalUser = user;
+        mUpdate.setOnClickListener(view -> {
             if (isValidated()) {
-                saveToDb(getUserDetails(new User()));
+                saveToDb(getUserDetails(finalUser));
             }
         });
+        showView(user);
+
+    }
+
+    private void showView(User user) {
+        mFirstName.setText(user.getfName());
+        mLastName.setText(user.getlName());
+        mEmail.setText(user.getEmail());
+        mPassword.setText(user.getPassword());
+        mMobile.setText(user.getMobile());
+        mGender.setText(user.getGender());
+        mSkills.setText(user.getSkills());
+        mDob.setText(user.getDob());
     }
 
     private void showSkillsDialog(boolean[] selectedSkills, String[] skills) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        // set title
         builder.setTitle("Select Skills");
 
-        // set dialog non cancelable
         builder.setCancelable(false);
 
         builder.setMultiChoiceItems(skills, selectedSkills, (dialogInterface, i, b) -> {
@@ -111,52 +129,38 @@ public class RegistrationActivity extends AppCompatActivity {
         });
 
         builder.setPositiveButton("OK", (dialogInterface, i) -> {
-            // Initialize string builder
             StringBuilder stringBuilder = new StringBuilder();
-            // use for loop
             for (int j = 0; j < skillsList.size(); j++) {
-                // concat array value
                 stringBuilder.append(skills[skillsList.get(j)]);
-                // check condition
                 if (j != skillsList.size() - 1) {
-                    // When j value  not equal
-                    // to lang list size - 1
-                    // add comma
                     stringBuilder.append(", ");
                 }
             }
-            // set text on textView
             mSkills.setText(stringBuilder.toString());
         });
 
         builder.setNegativeButton("Cancel", (dialogInterface, i) -> {
-            // dismiss dialog
             dialogInterface.dismiss();
         });
         builder.setNeutralButton("Clear All", (dialogInterface, i) -> {
-            // use for loop
             for (int j = 0; j < selectedSkills.length; j++) {
-                // remove all selection
                 selectedSkills[j] = false;
-                // clear language list
                 skillsList.clear();
-                // clear text view value
                 mSkills.setText("");
             }
         });
-        // show dialog
         builder.show();
     }
 
     private void saveToDb(User user) {
-        if (!databaseHelper.checkUser(mEmail.getText().toString())) {
-            databaseHelper.addUser(user);
-            ToastUtil.toastShort(this, "User Registered Successfully, Please login to continue");
+        if (databaseHelper.checkUser(mEmail.getText().toString())) {
+            databaseHelper.updateUser(user);
+            ToastUtil.toastShort(this, "User Updated Successfully, Please login to continue");
             Intent intent = new Intent(this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         } else {
-            ToastUtil.toastShort(this, "User Already Registered With This Email Id");
+            ToastUtil.toastShort(this, "User not found");
         }
     }
 

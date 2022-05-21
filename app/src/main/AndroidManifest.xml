@@ -11,6 +11,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UserRegisteration">
         <activity
+            android:name=".activity.UpdateActivity"
+            android:exported="true" />
+        <activity
             android:name=".activity.RegistrationActivity"
             android:exported="true" />
         <activity
